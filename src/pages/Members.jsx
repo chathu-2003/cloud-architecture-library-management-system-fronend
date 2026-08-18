@@ -1,4 +1,14 @@
 import React, { useState } from "react";
+import {
+  Users,
+  UserCheck,
+  GraduationCap,
+  UserPlus,
+  Search,
+  Trash2,
+  X,
+  Save,
+} from "lucide-react";
 
 function Members() {
   const [members, setMembers] = useState([
@@ -112,443 +122,486 @@ function Members() {
     return matchesSearch && matchesType;
   });
 
+  const stats = [
+    {
+      label: "Total Members",
+      value: members.length,
+      caption: "Registered members",
+      icon: Users,
+      spine: "#2F4538",
+    },
+    {
+      label: "Active Members",
+      value: members.filter((m) => m.status === "Active").length,
+      caption: "Currently active",
+      icon: UserCheck,
+      spine: "#3E7A4B",
+    },
+    {
+      label: "Students",
+      value: members.filter((m) => m.type === "Student").length,
+      caption: "Student members",
+      icon: GraduationCap,
+      spine: "#B08D57",
+    },
+  ];
+
   return (
-    <div className="container-fluid py-4">
+    <div className="lib-members container-fluid py-4">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap');
+
+        .lib-members {
+          font-family: 'Inter', sans-serif;
+          color: #2B2620;
+        }
+
+        .lib-members-header-title {
+          font-family: 'Fraunces', serif;
+          font-weight: 600;
+          font-size: 1.85rem;
+          color: #1F2A22;
+          display: flex;
+          align-items: center;
+          gap: 0.55rem;
+          margin-bottom: 0.2rem;
+        }
+
+        .lib-members-header-sub {
+          color: #8A7F6E;
+          font-size: 0.95rem;
+        }
+
+        .lib-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.55rem 1.1rem;
+          border-radius: 5px;
+          font-size: 0.9rem;
+          font-weight: 500;
+          border: 1px solid #2F4538;
+          cursor: pointer;
+          transition: background 0.15s ease, color 0.15s ease;
+        }
+
+        .lib-btn-primary {
+          background: #2F4538;
+          color: #FBF9F4;
+        }
+        .lib-btn-primary:hover { background: #24352C; }
+
+        .lib-btn-outline {
+          background: transparent;
+          color: #6B6155;
+          border-color: #D8CFBC;
+        }
+        .lib-btn-outline:hover {
+          background: #F1EBDB;
+          color: #2B2620;
+        }
+
+        .lib-btn-danger {
+          background: transparent;
+          color: #7A2E2E;
+          border-color: #E3C9C9;
+          padding: 0.32rem 0.65rem;
+          font-size: 0.8rem;
+        }
+        .lib-btn-danger:hover {
+          background: #7A2E2E;
+          color: #FBF9F4;
+        }
+
+        /* ---- stat cards ---- */
+        .lib-card {
+          position: relative;
+          background: #FBF9F4;
+          border: 1px solid #E4DCCB;
+          border-radius: 6px;
+          padding: 1.35rem 1.35rem 1.35rem 1.6rem;
+          overflow: hidden;
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .lib-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(43, 38, 32, 0.08);
+        }
+        .lib-card-spine {
+          position: absolute;
+          left: 0; top: 0; bottom: 0;
+          width: 6px;
+        }
+        .lib-card-icon {
+          width: 34px; height: 34px;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 0.85rem;
+        }
+        .lib-card-label {
+          font-size: 0.8rem;
+          font-weight: 600;
+          letter-spacing: 0.03em;
+          text-transform: uppercase;
+          color: #8A7F6E;
+          margin-bottom: 0.2rem;
+        }
+        .lib-card-value {
+          font-family: 'Fraunces', serif;
+          font-size: 2.1rem;
+          font-weight: 600;
+          color: #1F2A22;
+          line-height: 1.1;
+          margin-bottom: 0.3rem;
+        }
+        .lib-card-caption { color: #9C927F; font-size: 0.86rem; margin: 0; }
+
+        /* ---- panel ---- */
+        .lib-panel {
+          background: #FBF9F4;
+          border: 1px solid #E4DCCB;
+          border-radius: 8px;
+        }
+
+        .lib-panel-title {
+          font-family: 'Fraunces', serif;
+          font-weight: 600;
+          font-size: 1.1rem;
+          color: #1F2A22;
+        }
+
+        .lib-label {
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: #6B6155;
+          margin-bottom: 0.3rem;
+        }
+
+        .lib-input, .lib-select {
+          width: 100%;
+          background: #FFFEFB;
+          border: 1px solid #DDD4C0;
+          border-radius: 5px;
+          padding: 0.55rem 0.75rem;
+          font-size: 0.92rem;
+          color: #2B2620;
+          outline: none;
+          transition: border-color 0.15s ease;
+        }
+        .lib-input:focus, .lib-select:focus { border-color: #B08D57; }
+        .lib-input::placeholder { color: #B3A996; }
+
+        .lib-search-wrap { position: relative; }
+        .lib-search-wrap svg {
+          position: absolute;
+          left: 0.7rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #B3A996;
+        }
+        .lib-search-wrap input { padding-left: 2.2rem; }
+
+        .lib-count-badge {
+          background: #2F4538;
+          color: #FBF9F4;
+          font-size: 0.78rem;
+          font-weight: 600;
+          padding: 0.3rem 0.7rem;
+          border-radius: 20px;
+        }
+
+        .lib-table { width: 100%; border-collapse: collapse; }
+
+        .lib-table thead th {
+          text-align: left;
+          font-size: 0.74rem;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          color: #8A7F6E;
+          padding: 0.6rem 0.9rem;
+          border-bottom: 1px solid #E4DCCB;
+          background: #F4EFE3;
+        }
+
+        .lib-table tbody td {
+          padding: 0.8rem 0.9rem;
+          border-bottom: 1px solid #EFE9D9;
+          font-size: 0.92rem;
+          vertical-align: middle;
+        }
+
+        .lib-table tbody tr:hover { background: #F7F3E9; }
+
+        .lib-member-name { font-weight: 600; color: #1F2A22; }
+        .lib-member-email { color: #9C927F; font-size: 0.82rem; }
+
+        .lib-tag {
+          display: inline-block;
+          font-size: 0.76rem;
+          padding: 0.22rem 0.6rem;
+          border-radius: 20px;
+          background: #F1EBDB;
+          color: #6B5A3A;
+          border: 1px solid #E4DCCB;
+        }
+
+        .lib-status {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          font-size: 0.76rem;
+          font-weight: 600;
+          padding: 0.22rem 0.65rem;
+          border-radius: 20px;
+        }
+        .lib-status::before {
+          content: "";
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+        }
+        .lib-status-active { background: #E7EFE3; color: #2F4538; }
+        .lib-status-active::before { background: #3E7A4B; }
+        .lib-status-inactive { background: #EFEBE3; color: #7A7160; }
+        .lib-status-inactive::before { background: #A89E8B; }
+
+        .lib-empty { text-align: center; padding: 3rem 1rem; color: #9C927F; }
+      `}</style>
 
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
-          <h2 className="fw-bold mb-1">Members</h2>
-
-          <p className="text-muted mb-0">
+          <h2 className="lib-members-header-title">
+            <Users size={24} strokeWidth={2} color="#2F4538" />
+            Members
+          </h2>
+          <p className="lib-members-header-sub mb-0">
             Manage registered library members
           </p>
         </div>
 
         <button
-          className="btn btn-dark"
+          className="lib-btn lib-btn-primary"
           onClick={() => setShowForm(!showForm)}
         >
-          + Add Member
+          <UserPlus size={16} strokeWidth={2.3} />
+          Add Member
         </button>
       </div>
 
       {/* Statistics */}
       <div className="row g-4 mb-4">
-
-        {/* Total Members */}
-        <div className="col-md-4">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-
-              <h6 className="text-muted">
-                Total Members
-              </h6>
-
-              <h2 className="fw-bold">
-                {members.length}
-              </h2>
-
-              <p className="text-muted mb-0">
-                Registered members
-              </p>
-
+        {stats.map(({ label, value, caption, icon: Icon, spine }) => (
+          <div className="col-md-4" key={label}>
+            <div className="lib-card">
+              <div className="lib-card-spine" style={{ background: spine }} />
+              <div className="lib-card-icon" style={{ background: `${spine}1A` }}>
+                <Icon size={18} color={spine} strokeWidth={2} />
+              </div>
+              <div className="lib-card-label">{label}</div>
+              <div className="lib-card-value">{value}</div>
+              <p className="lib-card-caption">{caption}</p>
             </div>
           </div>
-        </div>
-
-        {/* Active Members */}
-        <div className="col-md-4">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-
-              <h6 className="text-muted">
-                Active Members
-              </h6>
-
-              <h2 className="fw-bold text-success">
-                {
-                  members.filter(
-                    (member) => member.status === "Active"
-                  ).length
-                }
-              </h2>
-
-              <p className="text-muted mb-0">
-                Currently active
-              </p>
-
-            </div>
-          </div>
-        </div>
-
-        {/* Students */}
-        <div className="col-md-4">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-
-              <h6 className="text-muted">
-                Students
-              </h6>
-
-              <h2 className="fw-bold">
-                {
-                  members.filter(
-                    (member) => member.type === "Student"
-                  ).length
-                }
-              </h2>
-
-              <p className="text-muted mb-0">
-                Student members
-              </p>
-
-            </div>
-          </div>
-        </div>
-
+        ))}
       </div>
 
       {/* Add Member Form */}
       {showForm && (
-        <div className="card border-0 shadow-sm mb-4">
-
-          <div className="card-body p-4">
-
-            <h5 className="fw-bold mb-4">
-              Add New Member
-            </h5>
+        <div className="lib-panel mb-4">
+          <div className="p-4">
+            <h5 className="lib-panel-title mb-4">Add New Member</h5>
 
             <form onSubmit={handleAddMember}>
-
               <div className="row g-3">
-
-                {/* Name */}
                 <div className="col-md-6">
-
-                  <label className="form-label fw-semibold">
-                    Full Name
-                  </label>
-
+                  <div className="lib-label">Full Name</div>
                   <input
                     type="text"
                     name="name"
-                    className="form-control"
+                    className="lib-input"
                     placeholder="Enter member name"
                     value={newMember.name}
                     onChange={handleChange}
                   />
-
                 </div>
 
-                {/* Email */}
                 <div className="col-md-6">
-
-                  <label className="form-label fw-semibold">
-                    Email Address
-                  </label>
-
+                  <div className="lib-label">Email Address</div>
                   <input
                     type="email"
                     name="email"
-                    className="form-control"
+                    className="lib-input"
                     placeholder="Enter email address"
                     value={newMember.email}
                     onChange={handleChange}
                   />
-
                 </div>
 
-                {/* Phone */}
                 <div className="col-md-6">
-
-                  <label className="form-label fw-semibold">
-                    Phone Number
-                  </label>
-
+                  <div className="lib-label">Phone Number</div>
                   <input
                     type="tel"
                     name="phone"
-                    className="form-control"
+                    className="lib-input"
                     placeholder="Enter phone number"
                     value={newMember.phone}
                     onChange={handleChange}
                   />
-
                 </div>
 
-                {/* Member Type */}
                 <div className="col-md-6">
-
-                  <label className="form-label fw-semibold">
-                    Member Type
-                  </label>
-
+                  <div className="lib-label">Member Type</div>
                   <select
                     name="type"
-                    className="form-select"
+                    className="lib-select"
                     value={newMember.type}
                     onChange={handleChange}
                   >
-
-                    <option value="">
-                      Select member type
-                    </option>
-
-                    <option value="Student">
-                      Student
-                    </option>
-
-                    <option value="Staff">
-                      Staff
-                    </option>
-
-                    <option value="Guest">
-                      Guest
-                    </option>
-
+                    <option value="">Select member type</option>
+                    <option value="Student">Student</option>
+                    <option value="Staff">Staff</option>
+                    <option value="Guest">Guest</option>
                   </select>
-
                 </div>
 
-                {/* Buttons */}
-                <div className="col-12">
-
-                  <button
-                    type="submit"
-                    className="btn btn-dark me-2"
-                  >
+                <div className="col-12 d-flex gap-2 mt-2">
+                  <button type="submit" className="lib-btn lib-btn-primary">
+                    <Save size={16} strokeWidth={2.3} />
                     Save Member
                   </button>
 
                   <button
                     type="button"
-                    className="btn btn-outline-secondary"
+                    className="lib-btn lib-btn-outline"
                     onClick={() => setShowForm(false)}
                   >
+                    <X size={16} strokeWidth={2.3} />
                     Cancel
                   </button>
-
                 </div>
-
               </div>
-
             </form>
-
           </div>
-
         </div>
       )}
 
       {/* Search and Filter */}
-      <div className="card border-0 shadow-sm mb-4">
-
-        <div className="card-body">
-
+      <div className="lib-panel mb-4">
+        <div className="p-4">
           <div className="row g-3">
-
-            {/* Search */}
             <div className="col-md-8">
-
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Search by name, email or membership ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-
+              <div className="lib-search-wrap">
+                <Search size={16} strokeWidth={2} />
+                <input
+                  type="text"
+                  className="lib-input"
+                  placeholder="Search by name, email or membership ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
 
-            {/* Filter */}
             <div className="col-md-4">
-
               <select
-                className="form-select"
+                className="lib-select"
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
               >
-
-                <option value="All">
-                  All Members
-                </option>
-
-                <option value="Student">
-                  Students
-                </option>
-
-                <option value="Staff">
-                  Staff
-                </option>
-
-                <option value="Guest">
-                  Guests
-                </option>
-
+                <option value="All">All Members</option>
+                <option value="Student">Students</option>
+                <option value="Staff">Staff</option>
+                <option value="Guest">Guests</option>
               </select>
-
             </div>
-
           </div>
-
         </div>
-
       </div>
 
       {/* Members Table */}
-      <div className="card border-0 shadow-sm">
-
-        <div className="card-body">
-
+      <div className="lib-panel">
+        <div className="p-4">
           <div className="d-flex justify-content-between align-items-center mb-3">
-
-            <h5 className="fw-bold mb-0">
-              All Members
-            </h5>
-
-            <span className="badge bg-dark">
+            <h5 className="lib-panel-title mb-0">All Members</h5>
+            <span className="lib-count-badge">
               {filteredMembers.length} Members
             </span>
-
           </div>
 
           <div className="table-responsive">
-
-            <table className="table table-hover align-middle">
-
-              <thead className="table-light">
-
+            <table className="lib-table">
+              <thead>
                 <tr>
-
                   <th>#</th>
-
                   <th>Member</th>
-
                   <th>Membership ID</th>
-
                   <th>Phone</th>
-
                   <th>Type</th>
-
                   <th>Status</th>
-
                   <th>Action</th>
-
                 </tr>
-
               </thead>
 
               <tbody>
-
                 {filteredMembers.length === 0 ? (
-
                   <tr>
-
-                    <td
-                      colSpan="7"
-                      className="text-center py-5 text-muted"
-                    >
+                    <td colSpan="7" className="lib-empty">
                       No members found.
                     </td>
-
                   </tr>
-
                 ) : (
-
                   filteredMembers.map((member, index) => (
-
                     <tr key={member.id}>
+                      <td>{index + 1}</td>
 
-                      {/* Number */}
                       <td>
-                        {index + 1}
+                        <div className="lib-member-name">{member.name}</div>
+                        <div className="lib-member-email">{member.email}</div>
                       </td>
 
-                      {/* Member */}
                       <td>
-
-                        <div className="fw-semibold">
-                          {member.name}
-                        </div>
-
-                        <small className="text-muted">
-                          {member.email}
-                        </small>
-
+                        <span className="lib-tag">{member.membershipId}</span>
                       </td>
 
-                      {/* Membership ID */}
+                      <td>{member.phone}</td>
+
                       <td>
-
-                        <span className="badge bg-light text-dark border">
-                          {member.membershipId}
-                        </span>
-
+                        <span className="lib-tag">{member.type}</span>
                       </td>
 
-                      {/* Phone */}
                       <td>
-                        {member.phone}
-                      </td>
-
-                      {/* Type */}
-                      <td>
-
-                        <span className="badge bg-light text-dark border">
-                          {member.type}
-                        </span>
-
-                      </td>
-
-                      {/* Status */}
-                      <td>
-
                         {member.status === "Active" ? (
-
-                          <span className="badge bg-success">
+                          <span className="lib-status lib-status-active">
                             Active
                           </span>
-
                         ) : (
-
-                          <span className="badge bg-secondary">
+                          <span className="lib-status lib-status-inactive">
                             Inactive
                           </span>
-
                         )}
-
                       </td>
 
-                      {/* Action */}
                       <td>
-
                         <button
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() =>
-                            handleDelete(member.id)
-                          }
+                          className="lib-btn lib-btn-danger"
+                          onClick={() => handleDelete(member.id)}
                         >
+                          <Trash2 size={14} strokeWidth={2} />
                           Delete
                         </button>
-
                       </td>
-
                     </tr>
-
                   ))
-
                 )}
-
               </tbody>
-
             </table>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }
