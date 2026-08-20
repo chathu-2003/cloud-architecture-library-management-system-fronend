@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   BookOpen,
   Plus,
@@ -45,6 +45,10 @@ function Books() {
     isbn: "",
   });
 
+  // search + filter state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All Categories");
+
   const handleChange = (e) => {
     setNewBook({
       ...newBook,
@@ -66,7 +70,7 @@ function Books() {
     }
 
     const book = {
-      id: books.length + 1,
+      id: Date.now(),
       title: newBook.title,
       author: newBook.author,
       category: newBook.category,
@@ -94,6 +98,61 @@ function Books() {
     if (confirmDelete) {
       setBooks(books.filter((book) => book.id !== id));
     }
+  };
+
+  const handleToggleStatus = (id) => {
+    setBooks(
+      books.map((book) =>
+        book.id === id
+          ? {
+              ...book,
+              status:
+                book.status === "Available" ? "Borrowed" : "Available",
+            }
+          : book
+      )
+    );
+  };
+
+  // unique category list derived from current data + form options,
+  // so the filter dropdown always reflects real categories
+  const categoryOptions = useMemo(() => {
+    const base = [
+      "Programming",
+      "Database",
+      "Networking",
+      "Cloud Computing",
+      "Self Development",
+      "Business",
+      "Science",
+      "Other",
+    ];
+    const fromBooks = books.map((b) => b.category);
+    return Array.from(new Set([...base, ...fromBooks]));
+  }, [books]);
+
+  // filtered list based on search term + category
+  const filteredBooks = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+
+    return books.filter((book) => {
+      const matchesSearch =
+        term === "" ||
+        book.title.toLowerCase().includes(term) ||
+        book.author.toLowerCase().includes(term) ||
+        book.isbn.toLowerCase().includes(term);
+
+      const matchesCategory =
+        categoryFilter === "All Categories" ||
+        book.category === categoryFilter;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [books, searchTerm, categoryFilter]);
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setCategoryFilter("All Categories");
   };
 
   return (
@@ -163,6 +222,18 @@ function Books() {
           color: #FBF9F4;
         }
 
+        .lib-btn-status {
+          background: transparent;
+          color: #2F4538;
+          border-color: #C9D6CC;
+          padding: 0.32rem 0.65rem;
+          font-size: 0.8rem;
+        }
+        .lib-btn-status:hover {
+          background: #2F4538;
+          color: #FBF9F4;
+        }
+
         .lib-panel {
           background: #FBF9F4;
           border: 1px solid #E4DCCB;
@@ -222,6 +293,19 @@ function Books() {
           border-radius: 20px;
         }
 
+        .lib-clear-link {
+          background: none;
+          border: none;
+          color: #B08D57;
+          font-size: 0.82rem;
+          font-weight: 600;
+          cursor: pointer;
+          padding: 0;
+        }
+        .lib-clear-link:hover {
+          text-decoration: underline;
+        }
+
         .lib-table {
           width: 100%;
           border-collapse: collapse;
@@ -273,6 +357,8 @@ function Books() {
           font-weight: 600;
           padding: 0.22rem 0.65rem;
           border-radius: 20px;
+          border: none;
+          cursor: pointer;
         }
 
         .lib-status::before {
@@ -293,6 +379,12 @@ function Books() {
           color: #8A5A2B;
         }
         .lib-status-borrowed::before { background: #B08D57; }
+
+        .lib-actions {
+          display: flex;
+          gap: 0.4rem;
+          flex-wrap: wrap;
+        }
 
         .lib-empty {
           text-align: center;
@@ -410,7 +502,7 @@ function Books() {
       {/* Search */}
       <div className="lib-panel mb-4">
         <div className="p-4">
-          <div className="row g-3">
+          <div className="row g-3 align-items-center">
             <div className="col-md-8">
               <div className="lib-search-wrap">
                 <Search size={16} strokeWidth={2} />
@@ -418,20 +510,38 @@ function Books() {
                   type="text"
                   className="lib-input"
                   placeholder="Search books by title, author or ISBN..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
 
             <div className="col-md-4">
-              <select className="lib-select">
+              <select
+                className="lib-select"
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+              >
                 <option>All Categories</option>
-                <option>Programming</option>
-                <option>Database</option>
-                <option>Networking</option>
-                <option>Cloud Computing</option>
-                <option>Self Development</option>
+                {categoryOptions.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
               </select>
             </div>
+
+            {(searchTerm || categoryFilter !== "All Categories") && (
+              <div className="col-12">
+                <button
+                  type="button"
+                  className="lib-clear-link"
+                  onClick={handleClearFilters}
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -441,7 +551,9 @@ function Books() {
         <div className="p-4">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="lib-panel-title mb-0">All Books</h5>
-            <span className="lib-count-badge">{books.length} Books</span>
+            <span className="lib-count-badge">
+              {filteredBooks.length} / {books.length} Books
+            </span>
           </div>
 
           <div className="table-responsive">
@@ -459,14 +571,16 @@ function Books() {
               </thead>
 
               <tbody>
-                {books.length === 0 ? (
+                {filteredBooks.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="lib-empty">
-                      No books available.
+                      {books.length === 0
+                        ? "No books available."
+                        : "No books match your search."}
                     </td>
                   </tr>
                 ) : (
-                  books.map((book, index) => (
+                  filteredBooks.map((book, index) => (
                     <tr key={book.id}>
                       <td>{index + 1}</td>
 
@@ -483,25 +597,30 @@ function Books() {
                       <td>{book.isbn}</td>
 
                       <td>
-                        {book.status === "Available" ? (
-                          <span className="lib-status lib-status-available">
-                            Available
-                          </span>
-                        ) : (
-                          <span className="lib-status lib-status-borrowed">
-                            Borrowed
-                          </span>
-                        )}
+                        <button
+                          type="button"
+                          className={
+                            book.status === "Available"
+                              ? "lib-status lib-status-available"
+                              : "lib-status lib-status-borrowed"
+                          }
+                          onClick={() => handleToggleStatus(book.id)}
+                          title="Click to toggle status"
+                        >
+                          {book.status}
+                        </button>
                       </td>
 
                       <td>
-                        <button
-                          className="lib-btn lib-btn-danger"
-                          onClick={() => handleDelete(book.id)}
-                        >
-                          <Trash2 size={14} strokeWidth={2} />
-                          Delete
-                        </button>
+                        <div className="lib-actions">
+                          <button
+                            className="lib-btn lib-btn-danger"
+                            onClick={() => handleDelete(book.id)}
+                          >
+                            <Trash2 size={14} strokeWidth={2} />
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
